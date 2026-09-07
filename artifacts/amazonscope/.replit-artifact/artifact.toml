@@ -1,0 +1,28 @@
+kind = "web"
+previewPath = "/"
+title = "AmazonScope"
+description = "A premium Amazon product intelligence platform for searching ASINs, analyzing sellers and reviews, discovering deals, and making faster marketplace decisions."
+version = "1.0.0"
+id = "artifacts/amazonscope"
+router = "path"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 18410
+
+[services.development]
+run = "pnpm --filter @workspace/amazonscope run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/amazonscope", "run", "build" ]
+serve = "static"
+publicDir = "artifacts/amazonscope/dist/public"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "18410"
+BASE_PATH = "/"
