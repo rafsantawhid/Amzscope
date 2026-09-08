@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <rect width="1200" height="630" fill="#192235"/>
+  <circle cx="1040" cy="72" r="240" fill="none" stroke="#087f9e" stroke-opacity=".28" stroke-width="42"/>
+  <circle cx="1010" cy="560" r="260" fill="none" stroke="#f7921e" stroke-opacity=".22" stroke-width="2"/>
+  <text x="86" y="112" fill="#f7921e" font-family="Arial, sans-serif" font-size="22" font-weight="700" letter-spacing="5">MARKETPLACE SIGNAL, DISTILLED</text>
+  <text x="86" y="250" fill="#ffffff" font-family="Arial, sans-serif" font-size="76" font-weight="700">Know what is moving</text>
+  <text x="86" y="338" fill="#0b91bb" font-family="Arial, sans-serif" font-size="76" font-weight="700">before the market does.</text>
+  <text x="86" y="430" fill="#c3cad6" font-family="Arial, sans-serif" font-size="28">Amazon product intelligence for sharper decisions.</text>
+  <text x="86" y="548" fill="#ffffff" font-family="Arial, sans-serif" font-size="28" font-weight="700">AMAZON<tspan fill="#f7921e">SCOPE</tspan></text>
+</svg>

@@ -3,20 +3,26 @@ info:
   # Do not change the title, if the title changes, the import paths will be broken
   title: Api
   version: 0.1.0
-  description: API specification
+  description: AmazonScope product intelligence API
 servers:
   - url: /api
     description: Base API path
 tags:
   - name: health
-    description: Health operations
+  - name: dashboard
+  - name: products
+  - name: sellers
+  - name: market
+  - name: influencers
+  - name: utilities
+  - name: library
+  - name: assistant
 paths:
   /healthz:
     get:
       operationId: healthCheck
       tags: [health]
       summary: Health check
-      description: Returns server health status
       responses:
         "200":
           description: Healthy
@@ -24,13 +30,839 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+  /dashboard:
+    get:
+      operationId: getDashboard
+      tags: [dashboard]
+      summary: Get dashboard intelligence
+      responses:
+        "200":
+          description: Dashboard snapshot
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Dashboard"
+  /products/search:
+    get:
+      operationId: searchProducts
+      tags: [products]
+      summary: Search Amazon products
+      parameters:
+        - $ref: "#/components/parameters/Query"
+        - $ref: "#/components/parameters/Page"
+        - $ref: "#/components/parameters/Marketplace"
+      responses:
+        "200":
+          description: Product search results
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProductSearchResponse"
+  /products/category:
+    get:
+      operationId: getProductsByCategory
+      tags: [products]
+      summary: Get products by category
+      parameters:
+        - name: categoryId
+          in: query
+          required: true
+          schema: { type: string }
+        - $ref: "#/components/parameters/Page"
+        - $ref: "#/components/parameters/Marketplace"
+      responses:
+        "200":
+          description: Category products
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProductSearchResponse"
+  /products/{asin}:
+    get:
+      operationId: getProductDetails
+      tags: [products]
+      summary: Get product details
+      parameters:
+        - $ref: "#/components/parameters/Asin"
+        - $ref: "#/components/parameters/Marketplace"
+      responses:
+        "200":
+          description: Product details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProductDetail"
+        "404":
+          $ref: "#/components/responses/NotFound"
+  /products/{asin}/offers:
+    get:
+      operationId: getProductOffers
+      tags: [products]
+      summary: Get product offers
+      parameters:
+        - $ref: "#/components/parameters/Asin"
+        - $ref: "#/components/parameters/Marketplace"
+      responses:
+        "200":
+          description: Product offers
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProductOffersResponse"
+  /products/{asin}/reviews:
+    get:
+      operationId: getProductReviews
+      tags: [products]
+      summary: Get product reviews
+      parameters:
+        - $ref: "#/components/parameters/Asin"
+        - $ref: "#/components/parameters/Page"
+        - $ref: "#/components/parameters/Marketplace"
+      responses:
+        "200":
+          description: Product reviews
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProductReviewsResponse"
+  /products/{asin}/reviews/{reviewId}:
+    get:
+      operationId: getProductReviewDetails
+      tags: [products]
+      summary: Get a product review
+      parameters:
+        - $ref: "#/components/parameters/Asin"
+        - name: reviewId
+          in: path
+          required: true
+          schema: { type: string }
+        - $ref: "#/components/parameters/Marketplace"
+      responses:
+        "200":
+          description: Product review details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Review"
+  /products/{asin}/top-reviews:
+    get:
+      operationId: getTopProductReviews
+      tags: [products]
+      summary: Get top product reviews
+      parameters:
+        - $ref: "#/components/parameters/Asin"
+        - $ref: "#/components/parameters/Marketplace"
+      responses:
+        "200":
+          description: Top product reviews
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProductReviewsResponse"
+  /products/scrape:
+    post:
+      operationId: scrapeProductByUrl
+      tags: [products]
+      summary: Scrape a product by Amazon URL
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ProductScrapeInput"
+      responses:
+        "200":
+          description: Scraped product
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProductDetail"
+  /sellers/{sellerId}:
+    get:
+      operationId: getSellerProfile
+      tags: [sellers]
+      summary: Get seller profile
+      parameters:
+        - $ref: "#/components/parameters/SellerId"
+        - $ref: "#/components/parameters/Marketplace"
+      responses:
+        "200":
+          description: Seller profile
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Seller"
+  /sellers/{sellerId}/reviews:
+    get:
+      operationId: getSellerReviews
+      tags: [sellers]
+      summary: Get seller reviews
+      parameters:
+        - $ref: "#/components/parameters/SellerId"
+        - $ref: "#/components/parameters/Page"
+        - $ref: "#/components/parameters/Marketplace"
+      responses:
+        "200":
+          description: Seller reviews
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProductReviewsResponse"
+  /sellers/{sellerId}/products:
+    get:
+      operationId: getSellerProducts
+      tags: [sellers]
+      summary: Get seller products
+      parameters:
+        - $ref: "#/components/parameters/SellerId"
+        - $ref: "#/components/parameters/Page"
+        - $ref: "#/components/parameters/Marketplace"
+      responses:
+        "200":
+          description: Seller products
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProductSearchResponse"
+  /market/best-sellers:
+    get:
+      operationId: getBestSellers
+      tags: [market]
+      summary: Get best sellers
+      parameters:
+        - name: categoryId
+          in: query
+          schema: { type: string }
+        - $ref: "#/components/parameters/Marketplace"
+      responses:
+        "200":
+          description: Best selling products
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProductSearchResponse"
+  /market/deals:
+    get:
+      operationId: getDeals
+      tags: [market]
+      summary: Get live deals
+      parameters:
+        - $ref: "#/components/parameters/Page"
+        - $ref: "#/components/parameters/Marketplace"
+      responses:
+        "200":
+          description: Live deals
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DealsResponse"
+  /market/deals/{dealId}/products:
+    get:
+      operationId: getDealProducts
+      tags: [market]
+      summary: Get products in a deal
+      parameters:
+        - name: dealId
+          in: path
+          required: true
+          schema: { type: string }
+        - $ref: "#/components/parameters/Marketplace"
+      responses:
+        "200":
+          description: Deal products
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProductSearchResponse"
+  /market/promo-codes/{code}:
+    get:
+      operationId: getPromoCodeDetails
+      tags: [market]
+      summary: Get promo code details
+      parameters:
+        - name: code
+          in: path
+          required: true
+          schema: { type: string }
+        - $ref: "#/components/parameters/Marketplace"
+      responses:
+        "200":
+          description: Promo code details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PromoCode"
+  /influencers/{influencerId}:
+    get:
+      operationId: getInfluencerProfile
+      tags: [influencers]
+      summary: Get influencer profile
+      parameters:
+        - name: influencerId
+          in: path
+          required: true
+          schema: { type: string }
+        - $ref: "#/components/parameters/Marketplace"
+      responses:
+        "200":
+          description: Influencer profile
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Influencer"
+  /influencers/{influencerId}/posts:
+    get:
+      operationId: getInfluencerPosts
+      tags: [influencers]
+      summary: Get influencer posts
+      parameters:
+        - name: influencerId
+          in: path
+          required: true
+          schema: { type: string }
+        - $ref: "#/components/parameters/Page"
+        - $ref: "#/components/parameters/Marketplace"
+      responses:
+        "200":
+          description: Influencer posts
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InfluencerPostsResponse"
+  /influencers/posts/{postId}/products:
+    get:
+      operationId: getInfluencerPostProducts
+      tags: [influencers]
+      summary: Get products tagged in an influencer post
+      parameters:
+        - name: postId
+          in: path
+          required: true
+          schema: { type: string }
+        - $ref: "#/components/parameters/Marketplace"
+      responses:
+        "200":
+          description: Tagged products
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProductSearchResponse"
+  /utils/asin/{asin}/gtin:
+    get:
+      operationId: convertAsinToGtin
+      tags: [utilities]
+      summary: Convert ASIN to GTIN
+      parameters:
+        - $ref: "#/components/parameters/Asin"
+      responses:
+        "200":
+          description: GTIN conversion
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/IdentifierConversion"
+  /utils/gtin/{gtin}/asin:
+    get:
+      operationId: convertGtinToAsin
+      tags: [utilities]
+      summary: Convert GTIN to ASIN
+      parameters:
+        - name: gtin
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        "200":
+          description: ASIN conversion
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/IdentifierConversion"
+  /categories:
+    get:
+      operationId: getCategories
+      tags: [utilities]
+      summary: Get product category list
+      parameters:
+        - $ref: "#/components/parameters/Marketplace"
+      responses:
+        "200":
+          description: Categories
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Category"
+  /search-history:
+    get:
+      operationId: getSearchHistory
+      tags: [library]
+      summary: Get recent search history
+      responses:
+        "200":
+          description: Search history
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/SearchHistoryEntry"
+  /saved-products:
+    get:
+      operationId: getSavedProducts
+      tags: [library]
+      summary: Get saved products
+      responses:
+        "200":
+          description: Saved products
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/SavedProduct"
+    post:
+      operationId: saveProduct
+      tags: [library]
+      summary: Save a product
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SavedProductInput"
+      responses:
+        "201":
+          description: Saved product
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SavedProduct"
+  /saved-products/{asin}:
+    delete:
+      operationId: removeSavedProduct
+      tags: [library]
+      summary: Remove a saved product
+      parameters:
+        - $ref: "#/components/parameters/Asin"
+      responses:
+        "204":
+          description: Removed
+  /api-status:
+    get:
+      operationId: getApiStatus
+      tags: [health]
+      summary: Get provider and cache status
+      responses:
+        "200":
+          description: API status
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiStatus"
+  /assistant/chat:
+    post:
+      operationId: sendAssistantMessage
+      tags: [assistant]
+      summary: Ask the Amazon AI assistant
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AssistantMessageInput"
+      responses:
+        "200":
+          description: Assistant response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AssistantMessage"
 components:
+  parameters:
+    Asin:
+      name: asin
+      in: path
+      required: true
+      schema:
+        type: string
+        minLength: 10
+        maxLength: 10
+    SellerId:
+      name: sellerId
+      in: path
+      required: true
+      schema: { type: string }
+    Query:
+      name: query
+      in: query
+      required: true
+      schema:
+        type: string
+        minLength: 1
+    Page:
+      name: page
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        default: 1
+    Marketplace:
+      name: marketplace
+      in: query
+      schema:
+        type: string
+        default: US
+  responses:
+    NotFound:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
   schemas:
+    Error:
+      type: object
+      required: [error]
+      properties:
+        error: { type: string }
     HealthStatus:
       type: object
+      required: [status]
       properties:
-        status:
+        status: { type: string }
+    DataMeta:
+      type: object
+      required: [source, fetchedAt]
+      properties:
+        source:
           type: string
-      required:
-        - status
-
+          enum: [live, cache, unavailable]
+        fetchedAt: { type: string, format: date-time }
+        stale:
+          type: boolean
+          default: false
+    ProductSummary:
+      type: object
+      required: [asin, title, brand, imageUrl, price, rating, reviewCount, rank, category]
+      properties:
+        asin: { type: string }
+        title: { type: string }
+        brand: { type: string }
+        imageUrl: { type: string }
+        price: { type: number }
+        listPrice:
+          type: ["number", "null"]
+        discountPercent:
+          type: ["number", "null"]
+        rating: { type: number }
+        reviewCount: { type: integer }
+        rank: { type: integer }
+        category: { type: string }
+        seller:
+          type: ["string", "null"]
+        badge:
+          type: ["string", "null"]
+        trend:
+          type: ["number", "null"]
+    ProductDetail:
+      allOf:
+        - $ref: "#/components/schemas/ProductSummary"
+        - type: object
+          required: [images, availability, bullets, description, variations, attributes, specifications, buyBox, meta]
+          properties:
+            images:
+              type: array
+              items: { type: string }
+            availability: { type: string }
+            bullets:
+              type: array
+              items: { type: string }
+            description: { type: string }
+            variations:
+              type: array
+              items: { type: string }
+            attributes:
+              type: object
+              additionalProperties: { type: string }
+            specifications:
+              type: object
+              additionalProperties: { type: string }
+            buyBox:
+              $ref: "#/components/schemas/Offer"
+            reviewHistogram:
+              type: array
+              items:
+                $ref: "#/components/schemas/RatingBucket"
+            meta:
+              $ref: "#/components/schemas/DataMeta"
+    Offer:
+      type: object
+      required: [seller, price, condition, fulfillment, buyBox]
+      properties:
+        seller: { type: string }
+        price: { type: number }
+        condition: { type: string }
+        fulfillment: { type: string }
+        buyBox: { type: boolean }
+        shipping:
+          type: ["number", "null"]
+    ProductSearchResponse:
+      type: object
+      required: [items, total, page, meta]
+      properties:
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/ProductSummary"
+        total: { type: integer }
+        page: { type: integer }
+        meta:
+          $ref: "#/components/schemas/DataMeta"
+    ProductOffersResponse:
+      type: object
+      required: [offers, meta]
+      properties:
+        offers:
+          type: array
+          items:
+            $ref: "#/components/schemas/Offer"
+        meta:
+          $ref: "#/components/schemas/DataMeta"
+    RatingBucket:
+      type: object
+      required: [rating, count, percentage]
+      properties:
+        rating: { type: integer }
+        count: { type: integer }
+        percentage: { type: number }
+    Review:
+      type: object
+      required: [id, asin, title, body, rating, author, verified, createdAt]
+      properties:
+        id: { type: string }
+        asin: { type: string }
+        title: { type: string }
+        body: { type: string }
+        rating: { type: integer }
+        author: { type: string }
+        verified: { type: boolean }
+        helpfulVotes: { type: integer }
+        createdAt: { type: string, format: date-time }
+    ProductReviewsResponse:
+      type: object
+      required: [reviews, total, histogram, meta]
+      properties:
+        reviews:
+          type: array
+          items:
+            $ref: "#/components/schemas/Review"
+        total: { type: integer }
+        histogram:
+          type: array
+          items:
+            $ref: "#/components/schemas/RatingBucket"
+        meta:
+          $ref: "#/components/schemas/DataMeta"
+    ProductScrapeInput:
+      type: object
+      required: [url]
+      properties:
+        url: { type: string, format: uri }
+        marketplace:
+          type: string
+          default: US
+    Seller:
+      type: object
+      required: [id, name, rating, reviewCount, productCount, marketplace, meta]
+      properties:
+        id: { type: string }
+        name: { type: string }
+        rating: { type: number }
+        reviewCount: { type: integer }
+        productCount: { type: integer }
+        marketplace: { type: string }
+        location:
+          type: ["string", "null"]
+        storefrontUrl:
+          type: ["string", "null"]
+        meta:
+          $ref: "#/components/schemas/DataMeta"
+    Deal:
+      type: object
+      required: [id, title, discountPercent, expiresAt, imageUrl]
+      properties:
+        id: { type: string }
+        title: { type: string }
+        discountPercent: { type: number }
+        expiresAt: { type: string, format: date-time }
+        imageUrl: { type: string }
+        products:
+          type: integer
+    DealsResponse:
+      type: object
+      required: [deals, meta]
+      properties:
+        deals:
+          type: array
+          items:
+            $ref: "#/components/schemas/Deal"
+        meta:
+          $ref: "#/components/schemas/DataMeta"
+    PromoCode:
+      type: object
+      required: [code, status, discountPercent]
+      properties:
+        code: { type: string }
+        status: { type: string }
+        discountPercent: { type: number }
+        expiresAt:
+          type: ["string", "null"]
+          format: date-time
+    Influencer:
+      type: object
+      required: [id, name, handle, followers, platform, meta]
+      properties:
+        id: { type: string }
+        name: { type: string }
+        handle: { type: string }
+        followers: { type: integer }
+        platform: { type: string }
+        avatarUrl:
+          type: ["string", "null"]
+        meta:
+          $ref: "#/components/schemas/DataMeta"
+    InfluencerPost:
+      type: object
+      required: [id, influencerId, title, publishedAt]
+      properties:
+        id: { type: string }
+        influencerId: { type: string }
+        title: { type: string }
+        publishedAt: { type: string, format: date-time }
+        engagementRate:
+          type: ["number", "null"]
+        imageUrl:
+          type: ["string", "null"]
+    InfluencerPostsResponse:
+      type: object
+      required: [posts, total, meta]
+      properties:
+        posts:
+          type: array
+          items:
+            $ref: "#/components/schemas/InfluencerPost"
+        total: { type: integer }
+        meta:
+          $ref: "#/components/schemas/DataMeta"
+    Category:
+      type: object
+      required: [id, name, productCount]
+      properties:
+        id: { type: string }
+        name: { type: string }
+        productCount: { type: integer }
+        parentId:
+          type: ["string", "null"]
+    IdentifierConversion:
+      type: object
+      required: [input, output, type]
+      properties:
+        input: { type: string }
+        output: { type: string }
+        type: { type: string }
+    SearchHistoryEntry:
+      type: object
+      required: [id, query, kind, searchedAt]
+      properties:
+        id: { type: string }
+        query: { type: string }
+        kind: { type: string }
+        searchedAt: { type: string, format: date-time }
+        resultCount:
+          type: ["integer", "null"]
+    SavedProduct:
+      type: object
+      required: [asin, title, imageUrl, savedAt]
+      properties:
+        asin: { type: string }
+        title: { type: string }
+        imageUrl: { type: string }
+        price:
+          type: ["number", "null"]
+        rating:
+          type: ["number", "null"]
+        savedAt: { type: string, format: date-time }
+    SavedProductInput:
+      type: object
+      required: [asin, title, imageUrl]
+      properties:
+        asin: { type: string }
+        title: { type: string }
+        imageUrl: { type: string }
+        price:
+          type: ["number", "null"]
+        rating:
+          type: ["number", "null"]
+    Dashboard:
+      type: object
+      required: [trackedProducts, searchesThisWeek, averageRating, marketPulse, trending, bestSellers, deals, categories, meta]
+      properties:
+        trackedProducts: { type: integer }
+        searchesThisWeek: { type: integer }
+        averageRating: { type: number }
+        marketPulse: { type: number }
+        trending:
+          type: array
+          items:
+            $ref: "#/components/schemas/ProductSummary"
+        bestSellers:
+          type: array
+          items:
+            $ref: "#/components/schemas/ProductSummary"
+        deals:
+          type: array
+          items:
+            $ref: "#/components/schemas/Deal"
+        categories:
+          type: array
+          items:
+            $ref: "#/components/schemas/Category"
+        meta:
+          $ref: "#/components/schemas/DataMeta"
+    ApiStatus:
+      type: object
+      required: [provider, cache, endpointCount]
+      properties:
+        provider:
+          type: string
+          enum: [connected, needs_setup, error]
+        cache:
+          type: string
+          enum: [ready, needs_setup, error]
+        endpointCount: { type: integer }
+        lastSync:
+          type: ["string", "null"]
+          format: date-time
+        message:
+          type: ["string", "null"]
+    AssistantMessageInput:
+      type: object
+      required: [message]
+      properties:
+        message:
+          type: string
+          minLength: 1
+        asin:
+          type: ["string", "null"]
+        context:
+          type: ["string", "null"]
+    AssistantMessage:
+      type: object
+      required: [id, role, content, createdAt]
+      properties:
+        id: { type: string }
+        role: { type: string, enum: [assistant] }
+        content: { type: string }
+        createdAt: { type: string, format: date-time }

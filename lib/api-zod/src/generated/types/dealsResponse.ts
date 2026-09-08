@@ -5,7 +5,10 @@
  * AmazonScope product intelligence API
  * OpenAPI spec version: 0.1.0
  */
+import type { DataMeta } from './dataMeta';
+import type { Deal } from './deal';
 
-export interface HealthStatus {
-  status: string;
+export interface DealsResponse {
+  deals: Deal[];
+  meta: DataMeta;
 }

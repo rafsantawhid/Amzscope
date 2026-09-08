@@ -1,0 +1,1 @@
+- [Vite SEO asset URLs](seo-vite-asset-urls.md) — root-relative canonical links can be treated as directory assets during Vite builds; create route-aware canonical tags at runtime when the production URL is unknown.

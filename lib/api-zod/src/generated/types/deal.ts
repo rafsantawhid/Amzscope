@@ -6,6 +6,11 @@
  * OpenAPI spec version: 0.1.0
  */
 
-export interface HealthStatus {
-  status: string;
+export interface Deal {
+  id: string;
+  title: string;
+  discountPercent: number;
+  expiresAt: Date;
+  imageUrl: string;
+  products?: number;
 }

@@ -5,7 +5,10 @@
  * AmazonScope product intelligence API
  * OpenAPI spec version: 0.1.0
  */
+import type { DataMetaSource } from './dataMetaSource';
 
-export interface HealthStatus {
-  status: string;
+export interface DataMeta {
+  source: DataMetaSource;
+  fetchedAt: Date;
+  stale?: boolean;
 }

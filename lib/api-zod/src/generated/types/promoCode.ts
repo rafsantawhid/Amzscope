@@ -6,6 +6,10 @@
  * OpenAPI spec version: 0.1.0
  */
 
-export interface HealthStatus {
+export interface PromoCode {
+  code: string;
   status: string;
+  discountPercent: number;
+  /** @nullable */
+  expiresAt?: Date | null;
 }

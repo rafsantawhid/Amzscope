@@ -5,7 +5,8 @@
  * AmazonScope product intelligence API
  * OpenAPI spec version: 0.1.0
  */
+import type { MarketplaceParameter } from './marketplaceParameter';
 
-export interface HealthStatus {
-  status: string;
-}
+export type GetProductOffersParams = {
+marketplace?: MarketplaceParameter;
+};
