@@ -137,7 +137,9 @@ router.get("/dashboard", async (_req, res) => {
       bestSellers:
         bestSellers.status === "fulfilled"
           ? productSearch(bestSellers.value.payload, bestSellers.value.meta, 1).items.slice(0, 6)
-          : [],
+          : trending.status === "fulfilled"
+            ? productSearch(trending.value.payload, trending.value.meta, 1).items.slice(0, 6)
+            : [],
       deals: dealPayload.map((deal, index) => ({
         id: String(deal.id ?? deal.deal_id ?? `deal-${index}`),
         title: String(deal.title ?? deal.name ?? "Amazon deal"),

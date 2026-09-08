@@ -45,23 +45,59 @@ function isRecord(value: unknown): value is JsonRecord {
 
 export function unwrapData(payload: unknown): unknown {
   if (!isRecord(payload)) return payload;
-  return payload.data ?? payload.results ?? payload.products ?? payload;
+  return (
+    payload.data ??
+    payload.results ??
+    payload.products ??
+    payload.items ??
+    payload.best_sellers ??
+    payload.deals ??
+    payload.categories ??
+    payload.reviews ??
+    payload.offers ??
+    payload
+  );
 }
 
 export function asList(payload: unknown): JsonRecord[] {
   const value = unwrapData(payload);
   if (Array.isArray(value)) return value.filter(isRecord);
   if (isRecord(value)) {
-    const nested = value.items ?? value.products ?? value.results ?? value.data;
-    if (Array.isArray(nested)) return nested.filter(isRecord);
+    for (const key of [
+      "items",
+      "products",
+      "results",
+      "data",
+      "best_sellers",
+      "deals",
+      "categories",
+      "reviews",
+      "offers",
+    ]) {
+      const nested = value[key];
+      if (Array.isArray(nested)) return nested.filter(isRecord);
+      if (isRecord(nested)) {
+        const nestedList = asList(nested);
+        if (nestedList.length) return nestedList;
+      }
+    }
   }
   return [];
+}
+
+function decodeText(value: string) {
+  return value
+    .replace(/&amp;/g, "&")
+    .replace(/&#x27;|&#39;/g, "'")
+    .replace(/&quot;/g, '"')
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">");
 }
 
 function firstString(value: JsonRecord, keys: string[], fallback = "") {
   for (const key of keys) {
     const candidate = value[key];
-    if (typeof candidate === "string" && candidate.trim()) return candidate;
+    if (typeof candidate === "string" && candidate.trim()) return decodeText(candidate);
   }
   return fallback;
 }
@@ -103,7 +139,7 @@ export function normalizeProduct(
   return {
     asin,
     title: firstString(value, ["title", "product_title", "name"], "Amazon product"),
-    brand: firstString(value, ["brand", "brand_name"], "Unknown brand"),
+    brand: firstString(value, ["brand", "brand_name", "product_brand", "manufacturer"], "Unknown brand"),
     imageUrl: firstString(value, ["image", "image_url", "product_photo", "thumbnail"]),
     price,
     listPrice: listPrice || null,
@@ -118,8 +154,8 @@ export function normalizeProduct(
     rank: Math.round(
       firstNumber(value, ["rank", "sales_rank", "best_sellers_rank"], index + 1),
     ),
-    category: firstString(value, ["category", "category_name", "department"], "Amazon"),
-    seller: firstString(value, ["seller", "seller_name", "merchant_name"]) || null,
+    category: firstString(value, ["category", "category_name", "product_category", "department"], "Amazon"),
+    seller: firstString(value, ["seller", "seller_name", "merchant_name", "product_seller"]) || null,
     badge: firstString(value, ["badge", "product_badge"]) || null,
     trend: null,
     meta,

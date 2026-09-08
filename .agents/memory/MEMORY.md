@@ -1,1 +1,2 @@
 - [Vite SEO asset URLs](seo-vite-asset-urls.md) — root-relative canonical links can be treated as directory assets during Vite builds; create route-aware canonical tags at runtime when the production URL is unknown.
+- [RapidAPI Amazon payloads](rapidapi-amazon-payloads.md) — live endpoints can nest lists under provider-specific keys and return HTML-encoded product text, so normalize recursively at the adapter boundary.
