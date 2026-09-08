@@ -9,7 +9,7 @@
     "typecheck": "pnpm run typecheck:libs && pnpm -r --filter \"./artifacts/**\" --filter \"./scripts\" --if-present run typecheck",
     "build:web": "pnpm --filter @workspace/amazonscope run build",
     "build:api": "pnpm --filter @workspace/api-server run build",
-    "build:render": "pnpm --filter @workspace/amazonscope run build && pnpm --filter @workspace/api-server run build",
+    "build:render": "PORT=${PORT:-10000} BASE_PATH=${BASE_PATH:-/} pnpm --filter @workspace/amazonscope run build && pnpm --filter @workspace/api-server run build && node scripts/copy-frontend-for-render.mjs",
     "start:render": "pnpm --filter @workspace/api-server run start"
   },
   "private": true,
